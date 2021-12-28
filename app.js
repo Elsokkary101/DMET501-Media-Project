@@ -29,6 +29,7 @@ function checkFileName(fileName) {
 function showTransformForm() {
   const increaseBrightnessForm = document.getElementById("increaseBrightnessForm");
   const decreaseBrightnessForm = document.getElementById("decreaseBrightnessForm");
+
   //Write your code here for the other forms
 
   const mylist = document.getElementById("myList");
@@ -46,8 +47,10 @@ function showTransformForm() {
     document.getElementById("decreaseContrastInputs").style.display = "none";
 
   } else if (transformType == "Decrease Brightness") {
-    //write your code here
-
+    document.getElementById("increaseBrightnessInputs").style.display = "none";
+    document.getElementById("decreaseBrightnessInputs").style.display = "initial";
+    document.getElementById("increaseContrastInputs").style.display = "none";
+    document.getElementById("decreaseContrastInputs").style.display = "none";
   } else if (transformType == "Increase Contrast") {
     //Write your code here
 
@@ -57,11 +60,19 @@ function showTransformForm() {
 
   // Listener to the event of submiting the increase brightness form
   increaseBrightnessForm.addEventListener("submit", (e) => {
-    e.preventDefault()
-    var ib = document.getElementById("ib").value
+    e.preventDefault();
+    document.getElementById("result").style.display = "none";
+    var ib = document.getElementById("ib").value;
     increaseBrightness(Number(ib))
   });
   //Write your code here for EventListeners for the other forms using the constants you will create in the transform function
+
+  decreaseBrightnessForm.addEventListener("submit", (e) => {
+    e.preventDefault()
+    document.getElementById("result").style.display = "none";
+    var db = document.getElementById("db").value
+    decreaseBrightness(Number(db))
+  });
 
 
   //Applies pixel-wise transformations to increase brightness
@@ -76,7 +87,7 @@ function showTransformForm() {
     //Images are displayed in the RGBA format so a greyscale pixel could look like (25,25,25,255)
     rgba = getRGBAValues(img, canvas, ctx);
 
-    for (i = 0; i < img.width * img.height * 4; i += 4) {
+    for (i = 0; i < (img.width * img.height * 4); i += 4) {
       val = rgba[i] + ib;
       if (val > 255) {
         val = 255;
@@ -90,6 +101,29 @@ function showTransformForm() {
 
   //Write your code here for three more functions for the other transformations
 
+  // Applies pixel-wise to decrease brightness
+  function decreaseBrightness(ib) {
+    const img = document.getElementById("inputImage");
+    const canvas = document.getElementById("resultImage");
+    const ctx = canvas.getContext('2d');
+
+    var transformedImage = [];
+    var val;
+
+    //Images are displayed in the RGBA format so a greyscale pixel could look like (25,25,25,255)
+    rgba = getRGBAValues(img, canvas, ctx);
+
+    for (i = 0; i < img.width * img.height * 4; i += 4) {
+      val = rgba[i] - ib;
+      if (val < 0) {
+        val = 0;
+      }
+      transformedImage.push(val, val, val, rgba[i + 3]);
+    }
+    console.log("done decreasing brightness");
+    displayResultImage(img, transformedImage, ctx);
+
+  }
 
 
   //Extracts rgba 1D array of all the pixels in the original image
@@ -102,6 +136,7 @@ function showTransformForm() {
     var rgba = ctx.getImageData(
       0, 0, img.width, img.height
     ).data;
+    console.log(rgba);
     return rgba;
   }
 

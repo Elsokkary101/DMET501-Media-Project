@@ -1,12 +1,46 @@
 
+.supermain {
+  position: relative;
+  padding: 20px;
+}
 
-  .column {
-    float: left;
-    padding: 5px;
-  }
+
+
+.mainStudent {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  justify-content: center;
+}
+.studentsID1 {
+  text-align: center;
+  margin: 20px;
+  font-family: monospace;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.studentsID1 p {
+  color: darkred;
+}
+.studentsID1 h3 {
+  color: darkblue;
   
-  .row::after {
+}
+.studentsID1 h4 {
+  color: green;
+}
+
+
+
+
+.column {
+    float: left;
+    padding: 5px; 
+}
+  
+.row::after {
     content: "";
     clear: both;
     display: table;
-  }
+}

@@ -29,7 +29,9 @@ function checkFileName(fileName) {
 function showTransformForm() {
   const increaseBrightnessForm = document.getElementById("increaseBrightnessForm");
   const decreaseBrightnessForm = document.getElementById("decreaseBrightnessForm");
-
+  const increaseContrastForm = document.getElementById("increaseContrastForm");
+  const decreaseContrastForm = document.getElementById("decreaseContrastForm");
+  const InverseForm = document.getElementById("InverseForm");
   //Write your code here for the other forms
 
   const mylist = document.getElementById("myList");
@@ -45,17 +47,34 @@ function showTransformForm() {
     document.getElementById("decreaseBrightnessInputs").style.display = "none";
     document.getElementById("increaseContrastInputs").style.display = "none";
     document.getElementById("decreaseContrastInputs").style.display = "none";
-
+    document.getElementById("InverseInputs").style.display = "none";
   } else if (transformType == "Decrease Brightness") {
     document.getElementById("increaseBrightnessInputs").style.display = "none";
     document.getElementById("decreaseBrightnessInputs").style.display = "initial";
     document.getElementById("increaseContrastInputs").style.display = "none";
     document.getElementById("decreaseContrastInputs").style.display = "none";
+    document.getElementById("InverseInputs").style.display = "none";
   } else if (transformType == "Increase Contrast") {
-    //Write your code here
+    document.getElementById("increaseBrightnessInputs").style.display = "none";
+    document.getElementById("decreaseBrightnessInputs").style.display = "none";
+    document.getElementById("increaseContrastInputs").style.display = "initial";
+    document.getElementById("decreaseContrastInputs").style.display = "none";
+    document.getElementById("InverseInputs").style.display = "none";
 
-  } else {
-    //Write your code here
+  } else if  (transformType == "Decrease Contrast"){
+    document.getElementById("increaseBrightnessInputs").style.display = "none";
+    document.getElementById("decreaseBrightnessInputs").style.display = "none";
+    document.getElementById("increaseContrastInputs").style.display = "none";
+    document.getElementById("decreaseContrastInputs").style.display = "initial";
+    document.getElementById("InverseInputs").style.display = "none";
+
+  }else {
+    // inverse of the image with negative effect
+    document.getElementById("increaseBrightnessInputs").style.display = "none";
+    document.getElementById("decreaseBrightnessInputs").style.display = "none";
+    document.getElementById("increaseContrastInputs").style.display = "none";
+    document.getElementById("decreaseContrastInputs").style.display = "none";
+    document.getElementById("InverseInputs").style.display = "initial";
   }
 
   // Listener to the event of submiting the increase brightness form
@@ -74,6 +93,33 @@ function showTransformForm() {
     decreaseBrightness(Number(db))
   });
 
+  increaseContrastForm.addEventListener("submit", (e) => {
+    e.preventDefault()
+    document.getElementById("result").style.display = "none";
+    var O_BrightestD = document.getElementById("O_BrightestD").value
+    var O_darkestB = document.getElementById("O_darkestB").value
+    var T_DarkestB = document.getElementById("T_DarkestB").value
+    var T_BrightestD = document.getElementById("T_BrightestD").value
+    
+    increaseContrast(Number(O_BrightestD) , Number(O_darkestB),Number(T_DarkestB) ,Number(T_BrightestD) )
+  });
+
+  decreaseContrastForm.addEventListener("submit", (e) => {
+    e.preventDefault()
+    document.getElementById("result").style.display = "none";
+    var O_BrightestD = document.getElementById("O_BrightestD1").value
+    var O_darkestB = document.getElementById("O_darkestB2").value
+    var T_DarkestB = document.getElementById("T_DarkestB3").value
+    var T_BrightestD = document.getElementById("T_BrightestD4").value
+    
+    decreaseContrast(Number(O_BrightestD) , Number(O_darkestB),Number(T_DarkestB) ,Number(T_BrightestD) )
+  });
+
+  InverseForm.addEventListener("submit", (e) => {
+    e.preventDefault()
+    document.getElementById("result").style.display = "none";
+    inverseEffect();
+  });
 
   //Applies pixel-wise transformations to increase brightness
   function increaseBrightness(ib) {
@@ -123,6 +169,137 @@ function showTransformForm() {
     console.log("done decreasing brightness");
     displayResultImage(img, transformedImage, ctx);
 
+  }
+
+  function increaseContrast(originalBrightestDark , originalDarkestBright , TransBrightestDark , TransDarkestBright) {
+    const img = document.getElementById("inputImage");
+    const canvas = document.getElementById("resultImage");
+    const ctx = canvas.getContext('2d');
+
+    var transformedImage = [];
+    var valData1;
+    var valData2;
+    var valData3;
+    
+    if (originalBrightestDark  == originalDarkestBright){
+      document.getElementById("error").style.display = "block";
+      return;
+    }
+    document.getElementById("error").style.display = "none";
+    var slope = (TransDarkestBright - TransBrightestDark)/(originalDarkestBright  - originalBrightestDark);
+
+    var c = TransBrightestDark - (slope * originalBrightestDark);
+    //Images are displayed in the RGBA format so a greyscale pixel could look like (25,25,25,255)
+    rgba = getRGBAValues(img, canvas, ctx);
+
+    for (i = 0; i < img.width * img.height * 4; i += 4) {
+      valData1 = rgba[i] * slope + c ;
+      valData2 = rgba[i+1] * slope + c ;
+      valData3 = rgba[i+2] * slope + c ;
+      
+      if (valData1 > 255){
+        valData1 = 255;
+      }else if (valData1 < 0){
+        valData1 = 0;
+      }
+
+      if (valData2 > 255){
+        valData2 = 255;
+      }else if (valData1 < 0){
+        valData2 = 0;
+      }
+
+      if (valData3 > 255){
+        valData3 = 255;
+      }else if (valData1 < 0){
+        valData3 = 0;
+      }      
+      
+      transformedImage.push(valData1, valData2, valData3, rgba[i + 3]);
+    }
+    console.log("done increaing contrast");
+    displayResultImage(img, transformedImage, ctx);
+
+  }
+
+
+  function decreaseContrast(originalBrightestDark , originalDarkestBright , TransBrightestDark , TransDarkestBright) {
+    const img = document.getElementById("inputImage");
+    const canvas = document.getElementById("resultImage");
+    const ctx = canvas.getContext('2d');
+
+    var transformedImage = [];
+    var valData1;
+    var valData2;
+    var valData3;
+    
+    if (originalBrightestDark  == originalDarkestBright){
+      document.getElementById("error").style.display = "block";
+      console.log("This is an error");
+      return;
+    }
+    document.getElementById("error").style.display = "none";
+    var slope = (TransDarkestBright - TransBrightestDark)/(originalDarkestBright  - originalBrightestDark);
+    var c = TransBrightestDark - (slope * originalBrightestDark);
+
+    // Transparent Bright Dark > Transparent Darkest Bright
+
+    //Images are displayed in the RGBA format so a greyscale pixel could look like (25,25,25,255)
+    rgba = getRGBAValues(img, canvas, ctx);
+
+    for (i = 0; i < img.width * img.height * 4; i += 4) {
+      valData1 = rgba[i] * slope + c ;
+      valData2 = rgba[i+1] * slope + c ;
+      valData3 = rgba[i+2] * slope + c ;
+      
+      if (valData1 > 255){
+        valData1 = 255;
+      }else if (valData1 < 0){
+        valData1 = 0;
+      }
+
+      if (valData2 > 255){
+        valData2 = 255;
+      }else if (valData1 < 0){
+        valData2 = 0;
+      }
+
+      if (valData3 > 255){
+        valData3 = 255;
+      }else if (valData1 < 0){
+        valData3 = 0;
+      }      
+      
+      transformedImage.push(valData1, valData2, valData3, rgba[i + 3]);
+    }
+    console.log("done decreasing contrast");
+    displayResultImage(img, transformedImage, ctx);
+
+  }
+ 
+  function inverseEffect () {
+
+    const img = document.getElementById("inputImage");
+    const canvas = document.getElementById("resultImage");
+    const ctx = canvas.getContext('2d');
+
+    var transformedImage = [];
+    var valdata1;
+    var valData2;
+    var valData3;
+
+    //Images are displayed in the RGBA format so a greyscale pixel could look like (25,25,25,255)
+    rgba = getRGBAValues(img, canvas, ctx);
+
+    for (i = 0; i < (img.width * img.height * 4); i += 4) {
+      valdata1 =  255 -rgba [i];
+      valData2 = 255 - rgba[i+1];
+      valData3 = 255 - rgba[i+2];
+      
+      transformedImage.push(valdata1, valData2, valData3, rgba[i + 3]);
+    }
+
+    displayResultImage(img, transformedImage, ctx);
   }
 
 

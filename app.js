@@ -287,7 +287,7 @@ function showTransformForm() {
     var valdata1;
     var valData2;
     var valData3;
-
+    document.getElementById("error").style.display = "none";
     //Images are displayed in the RGBA format so a greyscale pixel could look like (25,25,25,255)
     rgba = getRGBAValues(img, canvas, ctx);
 

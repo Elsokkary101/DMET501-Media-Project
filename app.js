@@ -8,7 +8,7 @@ function displayOriginalImage(event) {
       document.getElementById("transformation").style.display = "initial";
       document.getElementById("result").style.display = "none";
     }
-  }
+  }//
 }
 
 //Makes sure the uploaded file is a png or jpg image 

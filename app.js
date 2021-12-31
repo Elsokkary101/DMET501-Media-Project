@@ -180,23 +180,51 @@ function showTransformForm() {
     var valData1;
     var valData2;
     var valData3;
-    
+  
     if (originalBrightestDark  == originalDarkestBright){
       document.getElementById("error").style.display = "block";
       return;
     }
     document.getElementById("error").style.display = "none";
-    var slope = (TransDarkestBright - TransBrightestDark)/(originalDarkestBright  - originalBrightestDark);
 
+    var slopeBefore = (TransBrightestDark / originalBrightestDark);
+    var cbefore = 0;
+    
+    var slopeAfter = (255-TransDarkestBright) / (255 - originalDarkestBright);
+    var cAfter = TransDarkestBright - (slopeAfter * originalDarkestBright);
+
+    var slope = (TransDarkestBright - TransBrightestDark)/(originalDarkestBright  - originalBrightestDark);
     var c = TransBrightestDark - (slope * originalBrightestDark);
     //Images are displayed in the RGBA format so a greyscale pixel could look like (25,25,25,255)
     rgba = getRGBAValues(img, canvas, ctx);
 
     for (i = 0; i < img.width * img.height * 4; i += 4) {
+      
       valData1 = rgba[i] * slope + c ;
       valData2 = rgba[i+1] * slope + c ;
       valData3 = rgba[i+2] * slope + c ;
       
+
+      if (rgba[i]  < originalBrightestDark){
+        valData1 = rgba[i] * slopeBefore + cbefore ;
+      }else if (rgba[i] > originalDarkestBright){
+        valData1 = rgba[i] * slopeAfter + cAfter ;
+      }
+      
+      if (rgba[i+1]  < originalBrightestDark){
+        valData2 = rgba[i+1] * slopeBefore + cbefore ;
+      }else if (rgba[i+1] > originalDarkestBright){
+        valData2 = rgba[i+1] * slopeAfter + cAfter ;
+      }
+      
+      if (rgba[i+2]  < originalBrightestDark){
+        valData3 = rgba[i+2] * slopeBefore + cbefore ;
+      }else if (rgba[i+2] > originalDarkestBright){
+        valData3 = rgba[i+2] * slopeAfter + cAfter ;
+      }
+      
+      
+
       if (valData1 > 255){
         valData1 = 255;
       }else if (valData1 < 0){
@@ -205,15 +233,16 @@ function showTransformForm() {
 
       if (valData2 > 255){
         valData2 = 255;
-      }else if (valData1 < 0){
+      }else if (valData2 < 0){
         valData2 = 0;
       }
-
       if (valData3 > 255){
         valData3 = 255;
-      }else if (valData1 < 0){
+      }else if (valData3 < 0){
         valData3 = 0;
-      }      
+      }
+
+     
       
       transformedImage.push(valData1, valData2, valData3, rgba[i + 3]);
     }

@@ -17,7 +17,7 @@
   margin: 20px;
   font-family: monospace;
   font-weight: 600;
-  font-size: 15px;
+  font-size: 30px;
 }
 
 .studentsID1 p {
@@ -40,7 +40,12 @@
 }
 
 
-
+.form {
+  font-size: 20px;
+}
+.form input{
+  font-size: 25px;
+}
 .column {
     float: left;
     padding: 5px; 
